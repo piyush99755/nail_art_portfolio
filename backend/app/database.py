@@ -19,4 +19,4 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 #it is a base class for all models
-Base = declarative_base
+Base = declarative_base()

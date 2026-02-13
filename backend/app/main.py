@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from .database import engine #used to import database from current package
 from sqlalchemy import text
+from . import models
 
 #create application instance
 app = FastAPI()
+
+#create table automatically 
+models.Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():
