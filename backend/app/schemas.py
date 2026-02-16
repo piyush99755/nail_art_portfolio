@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+# =========================
+# Nail Art Schemas
+# =========================
 class NailArtBase(BaseModel):
     title: str
     description : str
@@ -17,3 +20,14 @@ class NailArtResponse(NailArtBase):
     class Config:
         from_attributes = True
     
+#==========================
+#Authentication Schemas
+#=========================
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+    
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str

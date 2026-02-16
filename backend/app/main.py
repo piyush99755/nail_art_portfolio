@@ -2,12 +2,13 @@ from fastapi import FastAPI
 from .database import engine #used to import database from current package
 from sqlalchemy import text
 from . import models
-from .routes import nail_art
+from .routes import nail_art, auth
 
 #create application instance
 app = FastAPI()
 
 app.include_router(nail_art.router)
+app.include_router(auth.router)
 
 #create table automatically 
 models.Base.metadata.create_all(bind=engine)
