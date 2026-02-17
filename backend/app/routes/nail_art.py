@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
+from ..auth_utils import get_current_user
+from ..models import User
 
 #all routes inside this file starts with /nail-arts
 router = APIRouter(
@@ -9,11 +11,16 @@ router = APIRouter(
     tags = ["Nail Arts"]
 )
 #post request for nail arts using nail art schemas
+#protected route (only admin allowed to access this endpoint)
 @router.post("/", response_model=schemas.NailArtResponse)
 def create_nail_art(
     nail_art:schemas.NailArtCreate,
-    db: Session = Depends(get_db) #creates database session before running following function
+    db: Session = Depends(get_db), #creates database session before running following function
+    current_user: User = Depends(get_current_user) #get current user
 ):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, details= "Not Authorized")
+        
     new_nail_art = models.NailArt(
         title=nail_art.title,
         description=nail_art.description,
@@ -46,8 +53,15 @@ def get_nail_art(nail_art_id: int, db: Session = Depends(get_db)):
     return nail_art
    
 #route to delete nail-art by filtering its ID 
+#protected route (only admin allowed to access this endpoint)
 @router.delete("/{nail_art_id}")
-def delete_nail_art(nail_art_id: int, db: Session = Depends(get_db)):
+def delete_nail_art(nail_art_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not Authorized")
+    
     nail_art = db.query(models.NailArt).filter(
         models.NailArt.id == nail_art_id
     ).first()

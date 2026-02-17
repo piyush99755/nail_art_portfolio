@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models
-from ..schemas import LoginRequest, TokenResponse
+from ..schemas import LoginRequest
 from ..auth_utils import create_access_token, verify_password 
-from pydantic import BaseModel
+
 
 
 router = APIRouter(
@@ -13,22 +14,25 @@ router = APIRouter(
 )
 
 @router.post('/login')
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+def login(
+    form_data:OAuth2PasswordRequestForm = Depends(), 
+    db: Session = Depends(get_db)):
     #filtering users through their email and fetch correct one
     user = db.query(models.User).filter(
-        models.User.email == request.email
+        models.User.email == form_data.username
         ).first()
     
     if not user:
-        raise HTTPException(status_code=404, details="Invalid Credentials!!!")
+        raise HTTPException(status_code=404, detail="Invalid Credentials!!!")
     
     #verify password by comparing plain password and hashed password
-    if not verify_password(request.password, user.password_hash):
-        raise HTTPException(status=404, details="Invalid Credentials!!!")
+    if not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(status=404, detail="Invalid Credentials!!!")
     
     #generating access token
     access_token = create_access_token(data={"sub":user.email})
     
+    #along with login return access token and its type
     return {"access_token": access_token, "token_type": "bearer"}
     
      
