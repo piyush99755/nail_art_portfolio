@@ -31,7 +31,7 @@ def create_access_token(data:dict):
     to_encode = data.copy()
     expire = datetime.utcnow() +timedelta(minutes=ACCESS_TOKEN_EXPIRY_MINUTES)
     to_encode.update({"exp":expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM) #this signs payload using SECRET_KEY, encodes it
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM) #this signs payload using SECRET_KEY, encodes it
     return encoded_jwt
 
 def get_current_user(
@@ -47,14 +47,14 @@ def get_current_user(
     try:
         #decoding token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get('sub')
-        if email is None:
+        user_id: str = payload.get('sub')
+        if user_id is None:
             raise credential_exception
     except JWTError:
         raise credential_exception
     
     user = db.query(models.User).filter(
-        models.User.email == email
+        models.User.id == int(user_id)
     ).first()
     
     if not user:

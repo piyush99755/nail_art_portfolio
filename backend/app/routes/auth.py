@@ -19,7 +19,7 @@ def login(
     db: Session = Depends(get_db)):
     #filtering users through their email and fetch correct one
     user = db.query(models.User).filter(
-        models.User.email == form_data.username
+        models.User.username == form_data.username
         ).first()
     
     if not user:
@@ -30,7 +30,7 @@ def login(
         raise HTTPException(status=404, detail="Invalid Credentials!!!")
     
     #generating access token
-    access_token = create_access_token(data={"sub":user.email})
+    access_token = create_access_token(data={"sub":str(user.id)})
     
     #along with login return access token and its type
     return {"access_token": access_token, "token_type": "bearer"}
