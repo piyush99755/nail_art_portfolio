@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, Form, UploadFile
+import cloudinary.uploader
+from ..cloudinary_config import cloudinary
 from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
@@ -14,18 +16,34 @@ router = APIRouter(
 #protected route (only admin allowed to access this endpoint)
 @router.post("/", response_model=schemas.NailArtResponse)
 def create_nail_art(
-    nail_art:schemas.NailArtCreate,
+    title: str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    file: UploadFile = File(...),
     db: Session = Depends(get_db), #creates database session before running following function
     current_user: User = Depends(get_current_user) #get current user
 ):
     if not current_user.is_admin:
-        raise HTTPException(status_code=403, details= "Not Authorized")
+        raise HTTPException(status_code=403, detail= "Not Authorized")
+    
+    #prevent from uploading random files apart from .jpeg or png
+    if file.content_type not in ['image/jpeg', 'image/png']:
+        raise HTTPException(status_code=400, detail="Invalid Image Format!!!")
+    
+    
+    #upload image to clodinary
+    try:
+        upload_result = cloudinary.uploader.upload(file.file)
+        image_url = upload_result['secure_url']
+    except Exception:
+        raise HTTPException(status_code= 500, detail="Image upload failed")
+    
         
     new_nail_art = models.NailArt(
-        title=nail_art.title,
-        description=nail_art.description,
-        category=nail_art.category,
-        image_url=nail_art.image_url
+        title=title,
+        description=description,
+        category=category,
+        image_url=image_url
     )
     
     db.add(new_nail_art)
