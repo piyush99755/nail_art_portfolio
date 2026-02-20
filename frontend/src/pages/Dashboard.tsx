@@ -8,6 +8,8 @@ const Dashboard = () => {
     const [description, setDescription] = useState<string>("");
     const [category, setCategory] = useState<string>("");
     const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean>(false);
 
     const handleUpload = async() => {
 
@@ -26,7 +28,8 @@ const Dashboard = () => {
 
         try {
             await api.post("/nail-arts/", formData);
-            alert("Upload Successful!");
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 3000);
 
             setTitle("");
             setDescription("");
@@ -38,48 +41,72 @@ const Dashboard = () => {
         }
     };
     return (
-        <div>
-            <h2>Admin Dashboard</h2>
-            <input 
+        
+        <div className="flex items-center justify-center min-h-[70vh]">
+            <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+                Admin Dashboard
+            </h2>
+
+            <p className="text-sm text-gray-500 text-center mb-6">
+                Upload new nail art designs to showcase on your portfolio.
+            </p>
+
+
+            <input
                 type="text"
-                placeholder='Title'
-                value = {title}
+                placeholder="Title"
+                value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                className="w-full border rounded-lg px-4 py-2 mb-4"
             />
 
-            <input 
-                type="text" 
-                placeholder='Description'
+            <input
+                type="text"
+                placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                className="w-full border rounded-lg px-4 py-2 mb-4"
             />
 
-            <input 
+            <input
                 type="text"
-                placeholder='category'
+                placeholder="Category"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)} 
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full border rounded-lg px-4 py-2 mb-4"
             />
 
-            <input 
-                type="file" 
+            <input
+                type="file"
+                className="w-full mb-6"
                 onChange={(e) => {
-                    if(e.target.files){
-                        setFile(e.target.files[0])
-                    }
+                if (e.target.files) {
+                    const selectedFile = e.target.files[0];
+                    setFile(selectedFile);
+                    setPreview(URL.createObjectURL(selectedFile));
+                }
                 }}
-            />
+                />
+                {preview && (
+                <img
+                src={preview}
+                alt="Preview"
+                className="w-full h-64 object-cover rounded-lg mb-4"
+                />
+                )}
+
             
-            <button onClick={handleUpload}>Upload</button>
-            {/* logout button */}
-            <button onClick={() => {
-                localStorage.removeItem("token");
-                window.location.href = "/login";
-            }}>
-                Logout
+            <button
+                onClick={handleUpload}
+                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+            >
+                Upload Nail Art
             </button>
+            </div>
         </div>
     );
+
 };
 
 export default Dashboard;

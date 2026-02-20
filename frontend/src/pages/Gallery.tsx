@@ -22,23 +22,21 @@ const Gallery = () => {
 
   return (
     //for every nail art in the array, render a card..
-    <div>
-      <h1>Nail Art Portfolio</h1>
-      <div style= {{display:'flex', flexWrap:'wrap', gap:'20px'}}>
+    <div >
+      <h1 className="text-3xl font-bold text-center mb-8">
+        Nail Art Portfolio
+      </h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {nailArts.map((art) => (
           <div
           key={art.id}
-          style={{
-            border: "1px solid #ddd",
-              padding: "10px",
-              width: "250px",
-          }}>
-            <img src={art.image_url} 
-            alt={art.title}
-            style={{ width: "100%", height: "200px", objectFit: "cover" }} 
-            />
-            <h3>{art.title}</h3>
-            <p>{art.category}</p>
+          className="bg-white p-8 rounded-xl shadow-md border border-gray-100 w-full max-w-lg">
+          <img src={art.image_url} 
+               alt={art.title}
+               className="w-full h-64 object-cover" 
+          />
+          <h3 className="text-lg font-semibold">{art.title}</h3>
+          <p className="text-sm text-gray-500">{art.category}</p>
           </div>
         ))}
       </div>

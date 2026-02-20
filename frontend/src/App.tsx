@@ -3,22 +3,47 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Gallery from './pages/Gallery';
 import ProtectedRoutes from './components/ProtectedRoutes';
+import Layout from "./components/Layout";
 
 function App() {
   
   return (
     
     <Routes>
-      <Route path="/" element={<Gallery />} />
-      <Route path="/login" element={<Login />} />
+      <Route 
+      path="/" 
+      element={
+      <Layout>
+        <Login />
+      </Layout>
+      } 
+      />
+
+      <Route 
+      path="/login" 
+      element={
+      <Layout>
+        <Login />
+      </Layout>
+      }
+      />
+
+      <Route
+      path="/gallery"
+      element={
+        <Layout>
+          <Gallery />
+        </Layout>
+      }>
+      </Route>
+
       <Route
       path="/dashboard" 
       element={
         <ProtectedRoutes>
-          <h1 className="text-4xl font-bold text-pink-500">
-            Tailwind Working
-          </h1>
-          <Dashboard /> 
+          <Layout>
+            <Dashboard /> 
+          </Layout>
         </ProtectedRoutes>
       }
       />

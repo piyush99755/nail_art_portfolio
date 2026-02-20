@@ -34,28 +34,48 @@ const Login = () => {
             navigate('/dashboard');
         }
         catch(error){
-            alert("Invalid Credentials");
+            console.error("Invalid Credentials", error);
         }
 
     };
 
     return (
-        <div>
-            <h2>
+        <div className="flex items-center justify-center min-h-[70vh]">
+            <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold text-center mb-6">
                 Admin Login
-            </h2>
-            <input type="username"
-                   placeholder="username or email"
-                   onChange={(e) => setIdentifier(e.target.value)} //setting up email or username value entered in placeholder
-            />
-            <input type="password"
-                   placeholder="password"
-                   onChange={(e) => setPassword(e.target.value)} //setting up password value entered in placeholder
-            />
-            <button onClick={handleLogin}>Login</button>
-        </div>
-    )
+                </h2>
 
+                <input
+                type="text"
+                placeholder="Username or Email"
+                className="w-full border rounded-lg px-4 py-2 mb-4"
+                onChange={(e) => setIdentifier(e.target.value)}
+                />
+
+                <input
+                type="password"
+                placeholder="Password"
+                className="w-full border rounded-lg px-4 py-2 mb-4"
+                onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <button
+                onClick={handleLogin}
+                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                >
+                Login
+                </button>
+
+                <button
+                onClick={() => navigate('/gallery')}
+                className="w-full mt-4 border border-pink-500 text-pink-500 py-2 rounded-lg hover:bg-pink-50 transition "
+                >
+                    Continue as guest
+                </button>
+            </div>
+        </div>
+    );
 }
 
 export default Login;
