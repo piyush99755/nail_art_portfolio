@@ -10,7 +10,7 @@ const Dashboard = () => {
     const [file, setFile] = useState<File | null>(null);
 
     const handleUpload = async() => {
-        
+
         if(!file){
             alert('Please select an image!!!');
             return;
@@ -71,6 +71,13 @@ const Dashboard = () => {
             />
             
             <button onClick={handleUpload}>Upload</button>
+            {/* logout button */}
+            <button onClick={() => {
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+            }}>
+                Logout
+            </button>
         </div>
     );
 };
