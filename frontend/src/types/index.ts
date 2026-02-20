@@ -1,6 +1,6 @@
 //frontend-backend alignment 
 //it defines shape of an object
-export interface  LoginResponse {
+export interface LoginResponse {
     access_token: string;
     token_type: string;
 }

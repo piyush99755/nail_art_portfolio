@@ -6,7 +6,7 @@ import ProtectedRoutes from './components/ProtectedRoutes';
 
 function App() {
   return (
-    <BrowserRouter>
+    
     <Routes>
       <Route path="/" element={<Gallery />} />
       <Route path="/login" element={<Login />} />
@@ -19,7 +19,7 @@ function App() {
       }
       />
     </Routes>
-    </BrowserRouter>
+    
   );
 }
 
