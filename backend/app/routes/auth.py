@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models
@@ -19,15 +20,20 @@ def login(
     db: Session = Depends(get_db)):
     #filtering users through their email and fetch correct one
     user = db.query(models.User).filter(
-        models.User.username == form_data.username
+        or_(
+            models.User.username == form_data.username,
+            models.User.email == form_data.username
+            
+        )
+        
         ).first()
     
     if not user:
-        raise HTTPException(status_code=404, detail="Invalid Credentials!!!")
+        raise HTTPException(status_code=401, detail="Invalid Credentials!!!")
     
     #verify password by comparing plain password and hashed password
     if not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(status=404, detail="Invalid Credentials!!!")
+        raise HTTPException(status=401, detail="Invalid Credentials!!!")
     
     #generating access token
     access_token = create_access_token(data={"sub":str(user.id)})
