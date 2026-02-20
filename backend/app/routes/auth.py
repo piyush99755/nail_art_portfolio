@@ -4,7 +4,6 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models
-from ..schemas import LoginRequest
 from ..auth_utils import create_access_token, verify_password 
 
 
