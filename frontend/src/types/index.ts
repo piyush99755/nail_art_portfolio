@@ -9,7 +9,7 @@ export interface NailArt {
     id:number;
     title:string;
     description: string;
-    catgory: string;
+    category: string;
     image_url:string;
     created_at:string;
 }

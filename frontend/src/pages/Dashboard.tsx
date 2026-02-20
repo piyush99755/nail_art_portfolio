@@ -3,19 +3,22 @@ import api from '../api/axios';
 
 const Dashboard = () => {
 
-    //initial state
+    //initial states
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [category, setCategory] = useState<string>("");
     const [file, setFile] = useState<File | null>(null);
 
     const handleUpload = async() => {
+        
         if(!file){
             alert('Please select an image!!!');
             return;
         }
 
         const formData = new FormData();
+
+        //adding key-value pairs into the FormData object...
         formData.append("title", title);
         formData.append("description", description);
         formData.append("category", category);
@@ -31,7 +34,7 @@ const Dashboard = () => {
             setFile(null);
         }
         catch(error){
-            alert("File upload failed!!!");
+           console.error("File upload failed!!!", error);
         }
     };
     return (
