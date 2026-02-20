@@ -29,6 +29,7 @@ const Login = () => {
                     
                 }
             );
+            //storing access token for future requests.
             localStorage.setItem("token", response.data.access_token);
             navigate('/dashboard');
         }
