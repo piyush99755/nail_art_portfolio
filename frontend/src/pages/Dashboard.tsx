@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import api from '../api/axios';
 
 const Dashboard = () => {
@@ -10,6 +10,9 @@ const Dashboard = () => {
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
+
+    //this gives direct access to DOM element
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleUpload = async() => {
 
@@ -35,6 +38,12 @@ const Dashboard = () => {
             setDescription("");
             setCategory("");
             setFile(null);
+            setPreview(null);
+
+            //reset the input manually
+            if(fileInputRef.current){
+                fileInputRef.current.value = "";
+            }
         }
         catch(error){
            console.error("File upload failed!!!", error);
@@ -47,6 +56,11 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold mb-6 text-center">
                 Admin Dashboard
             </h2>
+            {success && (
+                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg mb-4 text-center">
+                Upload successful!!!
+                </div>
+            )}
 
             <p className="text-sm text-gray-500 text-center mb-6">
                 Upload new nail art designs to showcase on your portfolio.
@@ -79,6 +93,7 @@ const Dashboard = () => {
 
             <input
                 type="file"
+                ref={fileInputRef}
                 className="w-full mb-6"
                 onChange={(e) => {
                 if (e.target.files) {
