@@ -55,7 +55,9 @@ def create_nail_art(
 #route to fetch all nail-arts from DB
 @router.get("/", response_model=list[schemas.NailArtResponse])
 def get_all_nail_arts(db: Session = Depends(get_db)):
-    nail_arts = db.query(models.NailArt).all()
+    nail_arts = db.query(models.NailArt).order_by(
+        models.NailArt.created_at.desc()
+    ).all()
     return nail_arts
 
 #route to fetch particular nail-art by using its Id
