@@ -22,7 +22,7 @@ const Book = () => {
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
-    
+
     return (
         <div className='max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md'>
             <h2 className='text-3xl font-bold mb-6 text-center'>
@@ -51,7 +51,7 @@ const Book = () => {
                     type="date"
                     value={date}
                     min={new Date().toISOString().split('T')[0]} 
-                    onChange={(e) => setTimeSlot(e.target.value)}
+                    onChange={(e) => setDate(e.target.value)}
                     className='w-full border-rounded-lg px-4 py-2'
                 />
             </div>
@@ -107,7 +107,7 @@ const Book = () => {
                 />
             </div>
             
-            {/* contact details section*/}
+            {/* submit button*/}
             <button
             className='w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition'
             >
