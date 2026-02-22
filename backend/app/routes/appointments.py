@@ -21,7 +21,7 @@ def create_appointment(
         appointment.appointment_time
     )
     
-    if appointment_datetime <= datetime.now(timezone.utc):
+    if appointment_datetime <= datetime.utcnow():
         raise HTTPException(status_code=400, detail="Cannot book past time!!!")
     
     #working hours(10-6)

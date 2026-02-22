@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import api from '../api/axios';
+import axios from 'axios';
 
 
 
@@ -15,13 +17,71 @@ const timeSlots = [
   "4:00 PM",
 ];
 const Book = () => {
+
     //state management
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+
     const [service, setService] = useState<string>("");
     const [date, setDate] = useState<string>("");
     const [timeSlot, setTimeSlot] = useState<string>("");
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
+
+    //handle appointment form submit
+    const handleSubmit = async() => {
+        //check all required fields have value
+        if (!service || !date || !timeSlot || !name || !email || !phone){
+            setMessage("Please fill in fields")
+            return;
+        }
+        setLoading(true);
+        setMessage(null);
+
+        try {
+            //convert "10:00Am" to 24-hours format
+            const [time, modifier] = timeSlot.split(' ');
+            const [rawHours, minutes] = time.split(':').map(Number);
+            let hours = rawHours;
+
+            if(modifier === 'PM' && hours !== 12) hours += 12;
+            if(modifier === 'AM' && hours === 12) hours = 0;
+
+            const formattedTime = `${hours.toString().padStart(2,"0")}:${minutes
+                .toString()
+                .padStart(2,"0")}:00`; 
+
+            await api.post('/appointments/',{
+                client_name:name,
+                client_email:email,
+                phone,
+                service_type:service,
+                appointment_date:date,
+                appointment_time:formattedTime,
+            });
+
+            //setting up states once booked successfully (setting back to empty field)
+            setMessage("Congrats,Appointment booked successfully!!!");
+            setService("");
+            setTimeSlot("");
+            setDate("");
+            setName("");
+            setEmail("");
+            setPhone("");
+        }catch(error){
+            if(axios.isAxiosError(error)) {
+                setMessage(error.response?.data?.detail || "Something went wrong");
+            } else {
+                setMessage("Something went wrong");
+            }
+            
+        }
+        finally{
+            setLoading(false);
+        }
+    
+    };
 
     return (
         <div className='max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md'>
@@ -109,10 +169,18 @@ const Book = () => {
             
             {/* submit button*/}
             <button
+            onClick={handleSubmit}
+            disabled={loading}
             className='w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition'
             >
-                Proceed to Confirmation
+               {loading ? 'Booking...' : 'Confirm Booking'}
             </button>
+
+            {message && (
+                <p className='mt-4 text-center text-sm text-gray-700'>
+                    {message}
+                </p>
+            )}
 
 
         </div>
