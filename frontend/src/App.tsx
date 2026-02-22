@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Gallery from './pages/Gallery';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Layout from "./components/Layout";
+import Book from "./pages/Book";
 
 function App() {
   
@@ -45,6 +46,15 @@ function App() {
             <Dashboard /> 
           </Layout>
         </ProtectedRoutes>
+      }
+      />
+
+      <Route
+      path='/book'
+      element={
+        <Layout>
+          <Book />
+        </Layout>
       }
       />
     </Routes>
