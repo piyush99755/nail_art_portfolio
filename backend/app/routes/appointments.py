@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime, time, timezone
 from ..database import get_db
 from .. import models, schemas
+from models import User
+from ..auth_utils import get_current_user
 
 router = APIRouter(
     prefix="/appointments",
@@ -53,5 +55,39 @@ def create_appointment(
     db.refresh(new_appointment)
     
     return new_appointment
+
+#fetch all appointments for admin dashboard
+@router.get('/', response_model=list[schemas.AppointmentResponse])
+def get_all_appointments(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not Authorized!!!")
     
+    appointments = db.query(models.Appointment).order_by(
+        models.Appointment.appointment_date).all()
+    
+    return appointments
+
+#endpoint to get Booked Slots by date
+@router.get('/booked-slots/{date}')
+def get_booked_slot(date: str, db: Session = Depends(get_db)):
+    
+    try:
+        selected_date = datetime.strptime(date, "%Y-%m-%d").date() #convert string into datetime object
+    except:
+        raise HTTPException(status_code=400, detail="Invalid date format")
+    
+    
+    appointments = db.query(models.Appointment).filter(
+        models.Appointment.appointment_date == selected_date,
+        models.Appointment.status != 'cancelled'
+    ).all()
+    
+    return [
+        #list comprehension
+        appt.appointment_time.strftime("%H %M %S") #string format time
+        for appt in appointments
+    ]
     
