@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import axios from 'axios';
 
@@ -28,6 +28,51 @@ const Book = () => {
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
+    const [bookedSlots, setBookedSlots] = useState<string[]>([])
+
+    //making function reference stable by using useCallback hook
+    const fetchBookedSlots = useCallback(async (selectedDate: string) => {
+
+            try {
+                const response =  await api.get<string[]>(
+                    `/appointments/booked-slots/${selectedDate}`
+                );
+                setBookedSlots(response.data);
+            } catch(error) {
+                console.error(`Failed to fetch booked slot for ${selectedDate}`, error)
+            }
+        }, []);
+
+    //useEffect books to handle booked slots...
+    useEffect(() => {
+        if(date) fetchBookedSlots(date);
+    }, [date, fetchBookedSlots]);
+
+    //convert slot to 24hours for comparison
+    const convertTo24Hour = (slot:string) => {
+        if(!slot) return "";
+
+        const parts = slot.split(' ');
+        if(parts.length !== 2) return "";
+        
+        const [time, modifier] = parts;
+
+        const timeParts = time.split(":");
+        if(timeParts.length !== 2) return "";
+
+        const [rawHours, minutes] = timeParts.map(Number); //convert time to number
+        let hours = rawHours;
+
+        if(modifier === "PM" && hours !== 12) hours += 12;
+        if(modifier === "AM" && hours === 12) hours = 0;
+
+        return `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}:00`;
+
+    };
+
+    //format current time slot to 24 hours format.. 
+    const formattedTime = convertTo24Hour(timeSlot); 
+    
 
     //handle appointment form submit
     const handleSubmit = async() => {
@@ -40,18 +85,8 @@ const Book = () => {
         setMessage(null);
 
         try {
-            //convert "10:00Am" to 24-hours format
-            const [time, modifier] = timeSlot.split(' ');
-            const [rawHours, minutes] = time.split(':').map(Number);
-            let hours = rawHours;
-
-            if(modifier === 'PM' && hours !== 12) hours += 12;
-            if(modifier === 'AM' && hours === 12) hours = 0;
-
-            const formattedTime = `${hours.toString().padStart(2,"0")}:${minutes
-                .toString()
-                .padStart(2,"0")}:00`; 
-
+            
+            
             await api.post('/appointments/',{
                 client_name:name,
                 client_email:email,
@@ -63,6 +98,7 @@ const Book = () => {
 
             //setting up states once booked successfully (setting back to empty field)
             setMessage("Congrats,Appointment booked successfully!!!");
+            await fetchBookedSlots(date);
             setService("");
             setTimeSlot("");
             setDate("");
@@ -95,7 +131,7 @@ const Book = () => {
                 <select 
                     value={service}
                     onChange = {(e) => setService(e.target.value)}
-                    className='w-full border-rounded-lg px-4 py-2'
+                    className='w-full border rounded-lg px-4 py-2'
                 >
                     <option value="">Choose a serivce</option>
                     <option value="Bridal">Bridal</option>
@@ -112,7 +148,7 @@ const Book = () => {
                     value={date}
                     min={new Date().toISOString().split('T')[0]} 
                     onChange={(e) => setDate(e.target.value)}
-                    className='w-full border-rounded-lg px-4 py-2'
+                    className='w-full border rounded-lg px-4 py-2'
                 />
             </div>
 
@@ -120,13 +156,19 @@ const Book = () => {
             <div className='mb-6'>
                 <label className='block mb-2 font-medium'>Select Time</label>
                 <div className='grid grid-cols-3 gap-3'>
-                    {timeSlots.map((slot) => (
-                        <button
+                    {timeSlots.map((slot) => {
+                        const formatted = convertTo24Hour(slot);
+                        const isBooked = bookedSlots.includes(formatted);
+                        return <button
                             key={slot}
                             type="button"
+                            disabled={isBooked}
                             onClick={() => setTimeSlot(slot)}
+                            //booked slots are visibly disabled..
                             className={`py-2 rounded-lg border ${
-                                timeSlot === slot
+                                isBooked
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                :  timeSlot===slot
                                 ? "bg-pink-500 text-white"
                                 : "bg-gray-100 hover:bg-gray-200"
                             }`
@@ -135,7 +177,7 @@ const Book = () => {
                             {slot}
 
                         </button>
-                    ))}
+                    })}
                 </div>
 
             </div>
@@ -171,7 +213,7 @@ const Book = () => {
             <button
             onClick={handleSubmit}
             disabled={loading}
-            className='w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition'
+            className='w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition disabled:opacity-50'
             >
                {loading ? 'Booking...' : 'Confirm Booking'}
             </button>

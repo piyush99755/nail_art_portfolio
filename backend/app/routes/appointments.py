@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, time, timezone
 from ..database import get_db
 from .. import models, schemas
-from models import User
+from ..models import User
 from ..auth_utils import get_current_user
 
 router = APIRouter(
@@ -87,7 +87,7 @@ def get_booked_slot(date: str, db: Session = Depends(get_db)):
     
     return [
         #list comprehension
-        appt.appointment_time.strftime("%H %M %S") #string format time
+        appt.appointment_time.strftime("%H:%M:%S") #string format time
         for appt in appointments
     ]
     

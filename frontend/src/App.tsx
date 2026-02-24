@@ -5,6 +5,8 @@ import Gallery from './pages/Gallery';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Layout from "./components/Layout";
 import Book from "./pages/Book";
+import AdminBookings from "./pages/AdminBookings";
+import AdminLayout from "./components/AdminLayout";
 
 function App() {
   
@@ -43,7 +45,9 @@ function App() {
       element={
         <ProtectedRoutes>
           <Layout>
-            <Dashboard /> 
+            <AdminLayout>
+              <Dashboard /> 
+            </AdminLayout>
           </Layout>
         </ProtectedRoutes>
       }
@@ -57,7 +61,19 @@ function App() {
         </Layout>
       }
       />
+      <Route
+      path='/dashboard/bookings'
+      element={
+        <ProtectedRoutes>
+          <Layout>
+            <AdminBookings />
+          </Layout>
+        </ProtectedRoutes>
+      }
+      />
     </Routes>
+
+    
     
   );
 }
