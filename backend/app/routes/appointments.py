@@ -5,6 +5,8 @@ from ..database import get_db
 from .. import models, schemas
 from ..models import User
 from ..auth_utils import get_current_user
+import stripe
+from ..stripe_config import stripe
 
 router = APIRouter(
     prefix="/appointments",
@@ -91,3 +93,40 @@ def get_booked_slot(date: str, db: Session = Depends(get_db)):
         for appt in appointments
     ]
     
+
+#endpoint for create-payment-intent stripe functionaity
+@router.post('/{appointment_id}/create-payment-intent')
+def create_payment_intent(
+    appointment_id: int,
+    db: Session = Depends(get_db)
+):
+    appointment = db.query(models.Appointment).filter(
+        models.Appointment.id == appointment_id
+    ).first()
+    
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Appointment not found!!!")
+    
+    # prevent double payment
+    if appointment.payment_status == 'paid':
+        raise HTTPException(status_code=400, detail="Already paid!!!")
+    
+    #example
+    amount = 5000 #$50.00
+    
+    #create payment intent object
+    intent = stripe.PaymentIntent.create(
+        amount = amount,
+        currency = "cad",
+        metadata = {
+            "appointment_id": appointment.id
+        }
+    )
+    
+    appointment.stripe_payment_intent_id = intent.id
+    db.commit()
+    
+    #return client secret required by frontend
+    return {
+        "client_secret": intent.client_secret
+    }

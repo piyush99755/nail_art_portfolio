@@ -39,5 +39,6 @@ class Appointment(Base):
     
     status = Column(String(50), default="pending")
     payment_status = Column(String(50), default="pending")
+    stripe_payment_intent_id = Column(String(255), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default= func.now())
