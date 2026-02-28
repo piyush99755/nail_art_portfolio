@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date, Time
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date, Time, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class NailArt(Base):
@@ -23,6 +24,17 @@ class User(Base):
     is_admin = Column(Boolean, default = True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
+class Service(Base):
+    
+    __tablename__ = "services"
+    
+    id= Column(Integer, index=True, primary_key=True)
+    name= Column(String(100), nullable=False, unique=True)
+    price= Column(Integer, nullable=False)
+    description = Column(String(255), nullable=True)
+    
+    
+    
 class Appointment(Base):
     
     __tablename__ = "appointments"
@@ -32,7 +44,8 @@ class Appointment(Base):
     client_email = Column(String(255), nullable=False)
     phone = Column(String(20), nullable=False)
     
-    service_type= Column(String(100), nullable=False)
+    service_id= Column(Integer, ForeignKey("services.id"))
+    service = relationship(Service)
     
     appointment_date = Column(Date, nullable=False)
     appointment_time = Column(Time, nullable=False)
@@ -42,3 +55,4 @@ class Appointment(Base):
     stripe_payment_intent_id = Column(String(255), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default= func.now())
+    
