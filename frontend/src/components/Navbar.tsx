@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-    const token = localStorage.getItem('token');
+    
 
     return (
         <nav className="bg-white shadow-md">
@@ -19,29 +19,12 @@ const Navbar = () => {
                         Book
                     </Link>
 
-                    {!token ? (
-                        <Link
-                            to='/login'
-                            className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition"
-                        >
-                            Admin Login
-                        </Link>
-                    ) : (
-                        <>
-                        <Link to='/dashboard' className="hover:text-pink-500">
-                            Dashboard
-                        </Link>
-                        <button onClick = {() =>{
-                            localStorage.removeItem('token');
-                            window.location.href ='/';
-
-                        }}
-                        className="bg-gray-200 px-4 py-2 rounded-lg"
-                        >
-                            Logout
-                        </button>
-                        </>
-                    )}
+                    <Link
+                        to="/login"
+                        className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition"
+                    >
+                        Admin Login
+                    </Link>
 
                 </div>
             </div>
