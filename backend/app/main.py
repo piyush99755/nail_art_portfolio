@@ -4,6 +4,10 @@ from .database import engine #used to import database from current package
 from sqlalchemy import text
 from . import models
 from .routes import nail_art, auth, appointments, webhook
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from .core.limiter import limiter
+from slowapi.middleware import SlowAPIMiddleware
 
 #create application instance
 app = FastAPI()
@@ -30,6 +34,10 @@ app.include_router(webhook.router)
 #create table automatically 
 models.Base.metadata.create_all(bind=engine)
 
+
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware) # apply rate limiting middleware
+
 @app.get("/")
 def read_root():
     return {"message: Nail Art Portfolio API running!!!"}
@@ -40,4 +48,11 @@ def test_db():
     with engine.connect() as connection:
         result = connection.execute(text("SELECT 1"))
         return {"db_status":"Connected"}
+    
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request, exc):
+    return JSONResponse(
+        status_code=429,
+        content = {"detail": "Too many requests, Please try again later."},
+    )
     

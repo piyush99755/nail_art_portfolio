@@ -1,4 +1,6 @@
-from fastapi import Depends,APIRouter,HTTPException
+from fastapi import Depends,APIRouter,HTTPException, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 from datetime import datetime, time, timezone
 from ..database import get_db
@@ -7,6 +9,7 @@ from ..models import User
 from ..auth_utils import get_current_user
 import stripe
 from ..stripe_config import stripe
+from ..core.limiter import limiter
 
 router = APIRouter(
     prefix="/appointments",
@@ -14,7 +17,9 @@ router = APIRouter(
 )
 
 @router.post('/', response_model=schemas.AppointmentResponse)
+@limiter.limit("5/minute")
 def create_appointment(
+    request:Request,
     appointment: schemas.AppointmentCreate,
     db: Session = Depends(get_db)
 ):
