@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import axios from 'axios';
+import {  useNavigate } from 'react-router-dom';
 
 
 
@@ -29,6 +30,8 @@ const Book = () => {
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [bookedSlots, setBookedSlots] = useState<string[]>([])
+
+    const navigate = useNavigate();
 
     //making function reference stable by using useCallback hook
     const fetchBookedSlots = useCallback(async (selectedDate: string) => {
@@ -87,7 +90,7 @@ const Book = () => {
         try {
             
             
-            await api.post('/appointments/',{
+            const response = await api.post('/appointments/',{
                 client_name:name,
                 client_email:email,
                 phone,
@@ -95,6 +98,11 @@ const Book = () => {
                 appointment_date:date,
                 appointment_time:formattedTime,
             });
+
+            const appointmentId = response.data.id;
+
+            //redirect to payment page
+            navigate(`/payment/${appointmentId}`)
 
             //setting up states once booked successfully (setting back to empty field)
             setMessage("Congrats,Appointment booked successfully!!!");

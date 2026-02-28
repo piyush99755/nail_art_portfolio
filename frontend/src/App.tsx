@@ -7,6 +7,7 @@ import Layout from "./components/Layout";
 import Book from "./pages/Book";
 import AdminBookings from "./pages/AdminBookings";
 import AdminLayout from "./components/AdminLayout";
+import PaymentWrapper from "./pages/PaymentWrapper";
 
 function App() {
   
@@ -61,6 +62,13 @@ function App() {
         </Layout>
       }
       />
+
+      <Route
+      path='/payment/:id'
+      element={<PaymentWrapper />}
+      /> 
+
+      
       <Route
       path='/dashboard/bookings'
       element={
