@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
 
-interface Props {
-  children: ReactNode;
-}
+import { Outlet, Link, useNavigate } from "react-router-dom";
 
-const AdminLayout = ({ children }: Props) => {
+
+
+const AdminLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,35 +12,26 @@ const AdminLayout = ({ children }: Props) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      {/* Admin Navigation Bar */}
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <div className="flex gap-4">
-          <Link
-            to="/dashboard"
-            className="px-4 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition"
-          >
-            Manage Nail Arts
-          </Link>
+    <div className="min-h-screen flex">
+      <aside className="w-64 bg-white shadow-md p-4">
+        <h2 className="font-bold mb-6">Admin Panel</h2>
 
-          <Link
-            to="/dashboard/bookings"
-            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+        <div className="flex flex-col gap-3">
+          <Link to="/dashboard">Manage Nail Arts</Link>
+          <Link to="/dashboard/bookings">View Bookings</Link>
+
+          <button
+            onClick={handleLogout}
+            className="mt-6 text-red-500 text-left"
           >
-            View Bookings
-          </Link>
+            Logout
+          </button>
         </div>
+      </aside>
 
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* Page Content */}
-      {children}
+      <main className="flex-1 p-6 bg-gray-50">
+        <Outlet />
+      </main>
     </div>
   );
 };

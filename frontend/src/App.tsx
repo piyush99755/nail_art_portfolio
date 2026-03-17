@@ -14,71 +14,29 @@ function App() {
   return (
     
     <Routes>
-      <Route 
-      path="/" 
-      element={
-      <Layout>
-        <Login />
-      </Layout>
-      } 
-      />
-
-      <Route 
-      path="/login" 
-      element={
-      <Layout>
-        <Login />
-      </Layout>
-      }
-      />
-
-      <Route
-      path="/gallery"
-      element={
-        <Layout>
-          <Gallery />
-        </Layout>
-      }>
+       {/*  PUBLIC ROUTES */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Gallery />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/book" element={<Book />} />
       </Route>
 
-      <Route
-      path="/dashboard" 
-      element={
-        <ProtectedRoutes>
-          <Layout>
-            <AdminLayout>
-              <Dashboard /> 
-            </AdminLayout>
-          </Layout>
-        </ProtectedRoutes>
-      }
-      />
+      {/* PAYMENT (no navbar) */}
+      <Route path="/payment/:id" element={<PaymentWrapper />} />
 
+      {/* ADMIN ROUTES */}
       <Route
-      path='/book'
-      element={
-        <Layout>
-          <Book />
-        </Layout>
-      }
-      />
-
-      <Route
-      path='/payment/:id'
-      element={<PaymentWrapper />}
-      /> 
-
-      
-      <Route
-      path='/dashboard/bookings'
-      element={
-        <ProtectedRoutes>
-          <Layout>
-            <AdminBookings />
-          </Layout>
-        </ProtectedRoutes>
-      }
-      />
+        path="/dashboard/*"
+        element={
+          <ProtectedRoutes>
+            <AdminLayout />
+          </ProtectedRoutes>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="bookings" element={<AdminBookings />} />
+      </Route>
     </Routes>
 
     
