@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
+import type { Service } from '../types';
 
 
 
@@ -17,13 +18,17 @@ const timeSlots = [
   "3:30 PM",
   "4:00 PM",
 ];
+
+
 const Book = () => {
 
     //state management
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
-    const [service, setService] = useState<string>("");
+    const [services, setServices] = useState<Service[]>([]);
+    const [serviceId, setServiceId] = useState<number | null>(null);
+
     const [date, setDate] = useState<string>("");
     const [timeSlot, setTimeSlot] = useState<string>("");
     const [name, setName] = useState<string>("");
@@ -32,6 +37,20 @@ const Book = () => {
     const [bookedSlots, setBookedSlots] = useState<string[]>([])
 
     const navigate = useNavigate();
+
+    //fetch services on load
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await api.get<Service[]>('/services/');
+                setServices(response.data);
+            }catch(error){
+                console.error("Failed to fetch services", error);
+            }
+
+        };
+        fetchServices();
+    },[])
 
     //making function reference stable by using useCallback hook
     const fetchBookedSlots = useCallback(async (selectedDate: string) => {
@@ -80,7 +99,7 @@ const Book = () => {
     //handle appointment form submit
     const handleSubmit = async() => {
         //check all required fields have value
-        if (!service || !date || !timeSlot || !name || !email || !phone){
+        if (!serviceId || !date || !timeSlot || !name || !email || !phone){
             setMessage("Please fill in fields")
             return;
         }
@@ -94,7 +113,7 @@ const Book = () => {
                 client_name:name,
                 client_email:email,
                 phone,
-                service_type:service,
+                service_id:serviceId,
                 appointment_date:date,
                 appointment_time:formattedTime,
             });
@@ -105,9 +124,9 @@ const Book = () => {
             navigate(`/payment/${appointmentId}`)
 
             //setting up states once booked successfully (setting back to empty field)
-            setMessage("Congrats,Appointment booked successfully!!!");
+            
             await fetchBookedSlots(date);
-            setService("");
+            setServiceId(null);
             setTimeSlot("");
             setDate("");
             setName("");
@@ -126,6 +145,10 @@ const Book = () => {
         }
     
     };
+ 
+    const selectedService = services.find(
+        (service) => service.id === serviceId
+    );
 
     return (
         <div className='max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md'>
@@ -137,16 +160,34 @@ const Book = () => {
             <div className='mb-6'>
                 <label className='block mb-2 font-medium'>Select Service</label>
                 <select 
-                    value={service}
-                    onChange = {(e) => setService(e.target.value)}
+                    value={serviceId ?? ""}
+                    onChange = {(e) => setServiceId(e.target.value ? Number(e.target.value) : null)}
                     className='w-full border rounded-lg px-4 py-2'
                 >
-                    <option value="">Choose a serivce</option>
-                    <option value="Bridal">Bridal</option>
-                    <option value="Gel Extention">Gel Extention</option>
-                    <option value="Minimal Art">Minimal Art</option>
-                    <option value="Custom Design">Custom Design</option>
+                    <option value="">Choose a Service</option>
+                    {services.map((service) => (
+                        <option key={service.id} value={service.id}>
+                            {service.name} -{" "}
+                            {new Intl.NumberFormat("en-CA",{
+                                style:"currency",
+                                currency:"CAD"
+                            }).format(service.price/100)}
+
+                        </option>
+
+                    ))}
+                    
                 </select>
+                {selectedService && (
+                    <p className="mt-2 font-semibold text-pink-600">
+                        Total:{" "}
+                        {new Intl.NumberFormat("en-CA", {
+                            style:"currency",
+                            currency:"CAD"
+
+                        }).format(selectedService.price /100)}
+                    </p>
+                )}
             </div>
             {/* Date picker */}
             <div className='mb-6'>

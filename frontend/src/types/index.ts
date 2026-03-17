@@ -24,3 +24,9 @@ export interface Appointment {
     appointment_time:string,
     status:string
 }
+
+export interface Service {
+    id:number,
+    name:string,
+    price:number
+}

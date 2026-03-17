@@ -11,6 +11,7 @@ import stripe
 from ..stripe_config import stripe
 from ..core.limiter import limiter
 
+
 router = APIRouter(
     prefix="/appointments",
     tags=["Appointments"]
@@ -27,7 +28,7 @@ def create_appointment(
     #check future date
     appointment_datetime = datetime.combine(
         appointment.appointment_date,
-        appointment.appointment_time
+        appointment_time
     )
     
     if appointment_datetime <= datetime.utcnow():
@@ -47,14 +48,20 @@ def create_appointment(
     if existing:
         raise HTTPException(status_code=400, detail="Time slot already booked!!!")
     
+    service = db.query(models.Service).filter(models.Service.id == appointment.service_id).first()
+    
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found!!!")
+    
     #generate new booking appointment
     new_appointment =models.Appointment(
+        service_id=appointment.service_id,
         client_name=appointment.client_name,
         client_email=appointment.client_email,
         phone=appointment.phone,
-        service_type=appointment.service_type,
         appointment_date=appointment.appointment_date,
         appointment_time=appointment.appointment_time
+        
     )
     
     db.add(new_appointment)
@@ -117,7 +124,7 @@ def create_payment_intent(
         raise HTTPException(status_code=400, detail="Already paid!!!")
     
     #example
-    amount = 5000 #$50.00
+    amount = appointment.service.price
     
     #create payment intent object
     intent = stripe.PaymentIntent.create(

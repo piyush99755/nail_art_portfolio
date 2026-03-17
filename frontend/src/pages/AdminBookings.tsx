@@ -45,7 +45,13 @@ const AdminBookings = () => {
                                 <td className="p-4">{appt.appointment_date}</td>
                                 <td className="p-4">{appt.appointment_time}</td>
                                 <td className="p-4">
-                                    <span className="px-3 py-1 bg-yellow-200 rounded-full text-sm">
+                                    <span
+                                        className={`px-3 py-1 rounded-full text-sm ${
+                                            appt.status === "confirmed"
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-yellow-100 text-yellow-700"
+                                        }`}
+                                        >
                                         {appt.status}
                                     </span>
                                 </td>

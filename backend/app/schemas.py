@@ -38,7 +38,7 @@ class AppointmentCreate(BaseModel):
     client_name:str
     client_email:str
     phone:str
-    service_type:str
+    service_id:int
     appointment_date:date
     appointment_time:time
 
