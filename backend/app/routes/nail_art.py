@@ -71,6 +71,47 @@ def get_nail_art(nail_art_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Nail Art not found!!!")
     
     return nail_art
+
+#edit nail art route
+@router.put("/{nail_art_id}", response_model=schemas.NailArtResponse)
+def update_nail_art(
+    nail_art_id:int,
+    title:str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    file: UploadFile = File(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not Authorized")
+    
+    nail_art = db.query(models.NailArt).filter(models.NailArt.id == nail_art_id).first()
+    
+    if not nail_art:
+        raise HTTPException(status_code=404, detail="Nail Art not found")
+    
+    #update text fields...
+    nail_art.title = title,
+    nail_art.category = category,
+    nail_art.description = description
+    
+    #if new image uploaded -> replace
+    if file:
+        if file.content_type not in ['image/jpeg', 'image/png']:
+            raise HTTPException(status_code = 400, detail = "Invalid Image Format")
+        
+        try:
+            upload_result = cloudinary.uploader.upload(file.file)
+            nail_art.image_url = upload_result['secure_url']
+        except Exception:
+            raise HTTPException(status_code = 500, detail="Image Upload Failed!!!")
+        
+    db.commit()
+    db.refresh(nail_art)
+    
+    return nail_art
+    
    
 #route to delete nail-art by filtering its ID 
 #protected route (only admin allowed to access this endpoint)
