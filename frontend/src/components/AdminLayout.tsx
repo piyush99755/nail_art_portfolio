@@ -29,7 +29,7 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      <main className="flex-1 p-6 bg-gray-50">
+      <main className="flex-1 p-6 bg-brand-secondary">
         <Outlet />
       </main>
     </div>

@@ -218,7 +218,7 @@ const Book = () => {
                                 isBooked
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 :  timeSlot===slot
-                                ? "bg-pink-500 text-white"
+                                ? "bg-brand-primary text-white"
                                 : "bg-gray-100 hover:bg-gray-200"
                             }`
                             }
@@ -262,7 +262,7 @@ const Book = () => {
             <button
             onClick={handleSubmit}
             disabled={loading}
-            className='w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 transition disabled:opacity-50'
+            className='w-full bg-brand-primary text-white py-3 rounded-lg hover:bg-black transition disabled:opacity-50'
             >
                {loading ? 'Booking...' : 'Confirm Booking'}
             </button>

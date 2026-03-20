@@ -62,14 +62,14 @@ const Login = () => {
 
                 <button
                 onClick={handleLogin}
-                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                className="w-full bg-brand-primary text-white py-2 rounded-lg hover:bg-black transition"
                 >
                 Login
                 </button>
 
                 <button
                 onClick={() => navigate('/gallery')}
-                className="w-full mt-4 border border-pink-500 text-pink-500 py-2 rounded-lg hover:bg-pink-50 transition "
+                className="w-full mt-4 border border-brand-primary text-brand-primary py-2 rounded-lg hover:bg-pink-50 transition "
                 >
                     Continue as guest
                 </button>

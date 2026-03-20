@@ -73,7 +73,7 @@ const Payment = ({appointmentId} : Props) => {
                 </p>
                 <button
                 onClick={() => navigate('/gallery', {replace:true})}
-                className="bg-pink-500 text-white px-4 py-2 rounded-lg"
+                className="bg-brand-primary text-white px-4 py-2 rounded-lg"
                 >
                     Back to gallery
                 </button>
@@ -100,7 +100,7 @@ const Payment = ({appointmentId} : Props) => {
             <button
             onClick={handlePayment}
             disabled={loading}
-            className="w-full bg-pink-500 text-white py-2 rounded"
+            className="w-full bg-brand-primary text-white py-2 rounded"
             >
                 {loading ? "Processing..." : "Pay Now"}
             </button>

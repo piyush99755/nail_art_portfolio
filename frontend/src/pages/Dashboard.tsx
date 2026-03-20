@@ -165,7 +165,7 @@ const Dashboard = () => {
             
             <button
                 onClick={handleUpload}
-                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition"
+                className="w-full bg-brand-primary text-white py-2 rounded-lg hover:bg-black transition"
             >
                 Upload Nail Art
             </button>
