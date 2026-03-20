@@ -3,6 +3,9 @@ import api from '../api/axios';
 import type { NailArt } from '../types';
 
 const Dashboard = () => {
+    type EditableNailArt = NailArt & {
+        file?:File;
+    };
 
     //initial states
     const [title, setTitle] = useState<string>("");
@@ -13,6 +16,7 @@ const Dashboard = () => {
     const [success, setSuccess] = useState<boolean>(false);
     const [nailArts, setNailArts] = useState<NailArt[]>([]);
     const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [editingNail, setEditingNail] = useState<EditableNailArt | null>(null);
 
     //this gives direct access to DOM element
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -68,10 +72,10 @@ const Dashboard = () => {
     };
 
     //delete nail art by id
-    const handleDelete = (id: number) => {
+   /*  const handleDelete = (id: number) => {
         setDeleteId(id);
     };
-
+ */
     const confirmDelete = async () =>{
         if(!deleteId) return;
         
@@ -90,6 +94,34 @@ const Dashboard = () => {
             console.error("Delete failed", error);
             //Rollback if backend fails
             setNailArts(previous);
+        }
+    };
+
+    const handleUpdate = async () => {
+        if (!editingNail) return;
+
+        const formData = new FormData();
+
+        formData.append("title", editingNail.title);
+        formData.append("description", editingNail.description);
+        formData.append("category", editingNail.category);
+
+        if (editingNail.file) {
+            formData.append("file", editingNail.file);
+        }
+
+        try {
+            await api.put(`/nail-arts/${editingNail.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            });
+
+            setEditingNail(null);
+
+            await fetchNailArts(); // refresh list
+        } catch (error) {
+            console.error("Update failed", error);
         }
     };
 
@@ -193,13 +225,21 @@ const Dashboard = () => {
                             <p className='text-sm text-gray-500 mb-3'>
                                 {art.category}
                             </p>
+                            <div className="flex gap-2">
+                        <button
+                            onClick={() => setEditingNail(art)}
+                            className="flex-1 bg-gray-200 text-black py-1 rounded-lg hover:bg-gray-300 transition"
+                        >
+                            Edit
+                        </button>
 
-                            <button
-                                onClick={() => setDeleteId(art.id)} //clicking delete  does not delete immidiately
-                                className='w-full bg-red-500 text-white py-1 rounded-lg hover:bg-red-600 transition'
-                            >
-                                Delete
-                            </button>
+                        <button
+                            onClick={() => setDeleteId(art.id)}
+                            className="flex-1 bg-red-500 text-white py-1 rounded-lg hover:bg-red-600 transition"
+                        >
+                            Delete
+                        </button>
+                        </div>
                         </div>
                     </div>
                 ))}
@@ -237,6 +277,73 @@ const Dashboard = () => {
                     </div>
 
                 </div>
+            )}
+
+            {editingNail && (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+
+                <h3 className="text-lg font-semibold mb-4">
+                    Edit Nail Art
+                </h3>
+
+                <input
+                    type="text"
+                    value={editingNail.title}
+                    onChange={(e) =>
+                    setEditingNail({ ...editingNail, title: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 mb-3"
+                />
+
+                <input
+                    type="text"
+                    value={editingNail.category}
+                    onChange={(e) =>
+                    setEditingNail({ ...editingNail, category: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 mb-3"
+                />
+
+                <textarea
+                    value={editingNail.description}
+                    onChange={(e) =>
+                    setEditingNail({ ...editingNail, description: e.target.value })
+                    }
+                    className="w-full border rounded-lg px-4 py-2 mb-3"
+                />
+
+                {/* Image Upload */}
+                <input
+                    type="file"
+                    onChange={(e) => {
+                    if (e.target.files) {
+                        setEditingNail({
+                        ...editingNail,
+                        file: e.target.files[0],
+                        });
+                    }
+                    }}
+                    className="mb-4"
+                />
+
+                <div className="flex justify-end gap-3">
+                    <button
+                    onClick={() => setEditingNail(null)}
+                    className="px-4 py-2 rounded-lg bg-gray-200"
+                    >
+                    Cancel
+                    </button>
+
+                    <button
+                    onClick={handleUpdate}
+                    className="px-4 py-2 rounded-lg bg-brand-primary text-white hover:bg-black"
+                    >
+                    Save Changes
+                    </button>
+                </div>
+                </div>
+            </div>
             )}
         </div>
     );
