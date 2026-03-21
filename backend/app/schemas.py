@@ -32,6 +32,14 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     
+class ServiceResponse(BaseModel):
+        id:int
+        name:str
+        price:int
+        
+        class config:
+            from_attributes = True
+    
 #==========================
 #Appointments Schemas
 #=========================
@@ -43,12 +51,21 @@ class AppointmentCreate(BaseModel):
     appointment_date:date
     appointment_time:time
 
-class AppointmentResponse(AppointmentCreate):
-    id:int
-    status:str
-    payment_status:str
-    created_at:datetime
-    
+class AppointmentResponse(BaseModel):
+    id: int
+    client_name: str
+    client_email: str
+    phone: str
+
+    appointment_date: date
+    appointment_time: time
+
+    status: str
+    payment_status: str
+    created_at: datetime
+
+    service: ServiceResponse 
+
     class Config:
         from_attributes = True
         

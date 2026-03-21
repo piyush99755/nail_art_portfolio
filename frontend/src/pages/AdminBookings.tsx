@@ -20,9 +20,9 @@ const AdminBookings = () => {
             <h2 className="text-2xl font-bold mb-6">
                 All Appointments
             </h2>
-            <div className="bg-white shadow-md rounded-xl overflow-hidden">
+            <div className="bg-white/70 backdrop-blur rounded-xl border border-brand-accent">
                 <table className="w-full text-left">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-brand-accent">
                         <tr>
                             <th className="p-4">Client</th>
                             <th className="p-4">Service</th>
@@ -41,7 +41,7 @@ const AdminBookings = () => {
                                         {appt.client_email}
                                     </div>
                                 </td>
-                                <td className="p-4">{appt.service_type}</td>
+                                <td className="p-4">{appt.service?.name || "N/A"}</td>
                                 <td className="p-4">{appt.appointment_date}</td>
                                 <td className="p-4">{appt.appointment_time}</td>
                                 <td className="p-4">

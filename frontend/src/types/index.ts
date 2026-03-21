@@ -19,7 +19,11 @@ export interface Appointment {
     client_name: string,
     client_email: string,
     phone: string,
-    service_type: string,
+    service: {
+    id: number;
+    name: string;
+    price: number;
+    };
     appointment_date:string,
     appointment_time:string,
     status:string
