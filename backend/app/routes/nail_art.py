@@ -85,7 +85,7 @@ def update_nail_art(
     nail_art_id:int,
     title:str = Form(...),
     description: str = Form(...),
-    category: str = Form(...),
+    service_id: int = Form(...),
     file: UploadFile = File(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -100,7 +100,7 @@ def update_nail_art(
     
     #update text fields...
     nail_art.title = title,
-    nail_art.category = category,
+    nail_art.service_id = service_id,
     nail_art.description = description
     
     #if new image uploaded -> replace
