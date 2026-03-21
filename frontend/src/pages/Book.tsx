@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
 import axios from 'axios';
-import {  useNavigate } from 'react-router-dom';
+import {  useNavigate, useLocation } from 'react-router-dom';
 import type { Service } from '../types';
 
 
@@ -37,6 +37,10 @@ const Book = () => {
     const [bookedSlots, setBookedSlots] = useState<string[]>([])
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const selectedServiceId = location.state?.selectedServiceId;
+    const selectedNail = location.state?.selectedNail;
 
     //fetch services on load
     useEffect(() => {
@@ -51,6 +55,12 @@ const Book = () => {
         };
         fetchServices();
     },[])
+
+    useEffect(() => {
+        if (selectedServiceId) {
+            setServiceId(selectedServiceId);
+        }
+    }, [selectedServiceId]);
 
     //making function reference stable by using useCallback hook
     const fetchBookedSlots = useCallback(async (selectedDate: string) => {
@@ -155,6 +165,20 @@ const Book = () => {
             <h2 className='text-3xl font-bold mb-6 text-center'>
                 Book an Appointment
             </h2>
+            {/* Show selected Nail preview */}
+            {selectedNail && (
+                <div className="mb-6">
+                    <p className="text-sm text-gray-500 mb-2">Selected Style:</p>
+                    <img
+                    src={selectedNail.image_url}
+                    alt={selectedNail.title}
+                    className="w-32 h-32 object-cover rounded-lg shadow"
+                    />
+                    <p className="text-sm mt-2 font-medium">
+                    {selectedNail.title}
+                    </p>
+                </div>
+            )}
             {/* Form will go here */}
             {/* Service dropdown */}
             <div className='mb-6'>

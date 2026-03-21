@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
-import type { NailArt } from '../types';
+import type { NailArt, Service } from '../types';
 
 const Dashboard = () => {
     type EditableNailArt = NailArt & {
@@ -10,18 +10,25 @@ const Dashboard = () => {
     //initial states
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [category, setCategory] = useState<string>("");
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
     const [nailArts, setNailArts] = useState<NailArt[]>([]);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [editingNail, setEditingNail] = useState<EditableNailArt | null>(null);
+    const [serviceId, setServiceId] = useState<number | "">("");
+    const [services, setServices] = useState<Service[]>([]);
 
     //this gives direct access to DOM element
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const itemToDelete = nailArts.find(art => art.id === deleteId);
+
+    //helper function
+    const getServiceName = (id: number) => {
+        return services.find((s) => s.id === id)?.name || "Unknown";
+        
+    }
 
     const handleUpload = async() => {
 
@@ -30,12 +37,17 @@ const Dashboard = () => {
             return;
         }
 
+        if(!serviceId){
+            alert('Please select a service!!!');
+            return;
+        }
+
         const formData = new FormData();
 
         //adding key-value pairs into the FormData object...
         formData.append("title", title);
         formData.append("description", description);
-        formData.append("category", category);
+        formData.append("service_id", String(serviceId));
         formData.append("file", file);
 
         try {
@@ -45,7 +57,7 @@ const Dashboard = () => {
 
             setTitle("");
             setDescription("");
-            setCategory("");
+           
             setFile(null);
             setPreview(null);
 
@@ -99,12 +111,17 @@ const Dashboard = () => {
 
     const handleUpdate = async () => {
         if (!editingNail) return;
+        
+        if (!editingNail.service_id) {
+            alert("Please select a service");
+            return;
+        }
 
         const formData = new FormData();
 
         formData.append("title", editingNail.title);
         formData.append("description", editingNail.description);
-        formData.append("category", editingNail.category);
+        formData.append("service_id", String(editingNail.service_id));
 
         if (editingNail.file) {
             formData.append("file", editingNail.file);
@@ -129,6 +146,19 @@ const Dashboard = () => {
     useEffect(() => {
         fetchNailArts();
     }, []);
+
+    //fetch services
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const res = await api.get("/services");
+                setServices(res.data);
+            } catch(err) {
+                console.error("Failed to fetch services", err)
+            }
+        };
+        fetchServices();
+    },[])
 
     return (
         
@@ -166,13 +196,19 @@ const Dashboard = () => {
                 className="w-full border rounded-lg px-4 py-2 mb-4"
             />
 
-            <input
-                type="text"
-                placeholder="Category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+            <select
+                value={serviceId}
+                onChange={(e)=> setServiceId(e.target.value ? Number(e.target.value) : "")}
                 className="w-full border rounded-lg px-4 py-2 mb-4"
-            />
+            >
+                <option value="">Select Service</option>
+                {services.map((service) => (
+                    <option key={service.id} value={service.id}>
+                        {service.name}
+                    </option>
+                ))}
+
+            </select>
 
             <input
                 type="file"
@@ -223,7 +259,7 @@ const Dashboard = () => {
                         <div className='p-4'>
                             <h4 className='font-semibold'>{art.title}</h4>
                             <p className='text-sm text-gray-500 mb-3'>
-                                {art.category}
+                                {getServiceName(art.service_id)}
                             </p>
                             <div className="flex gap-2">
                         <button
@@ -296,15 +332,23 @@ const Dashboard = () => {
                     className="w-full border rounded-lg px-4 py-2 mb-3"
                 />
 
-                <input
-                    type="text"
-                    value={editingNail.category}
-                    onChange={(e) =>
-                    setEditingNail({ ...editingNail, category: e.target.value })
+                <select 
+                    value={editingNail.service_id}
+                    onChange={(e) => 
+                        setEditingNail({
+                            ...editingNail,
+                            service_id:Number(e.target.value)
+                        })
                     }
                     className="w-full border rounded-lg px-4 py-2 mb-3"
-                />
-
+                >
+                    <option value="">Select Service</option>
+                    {services.map((service) => (
+                        <option key={service.id} value={service.id}>
+                            {service.name}
+                        </option>
+                    ))}
+                </select>
                 <textarea
                     value={editingNail.description}
                     onChange={(e) =>

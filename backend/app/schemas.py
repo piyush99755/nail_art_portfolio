@@ -8,7 +8,6 @@ from datetime import datetime, date, time
 class NailArtBase(BaseModel):
     title: str
     description : str
-    category : str
     image_url : str
     
 

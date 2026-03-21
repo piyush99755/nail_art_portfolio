@@ -1,11 +1,15 @@
 import { useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import api from '../api/axios';
-import type { NailArt } from '../types';
+import type { NailArt, Service } from '../types';
 
 const Gallery = () => {
   //initial state
   const [nailArts, setNailarts] = useState<NailArt[]>([]);
   const [selectedNail, setSelectedNail] = useState<NailArt | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  
+  const navigate = useNavigate();
 
   //runs side effects  after a component render
   useEffect(() => {
@@ -20,6 +24,24 @@ const Gallery = () => {
     };
     fetchNailArts();
   },[]);
+
+  useEffect(() => {
+  const fetchServices = async () => {
+    try {
+      const res = await api.get("/services");
+      setServices(res.data);
+    } catch (err) {
+      console.error("Failed to fetch services", err);
+    }
+  };
+
+    fetchServices();
+  }, []);
+
+  //helper function
+  const getServiceName = (id: number) => {
+    return services.find((s) => s.id === id)?.name || "Unknown";
+  };
 
   return (
     //for every nail art in the array, render a card..
@@ -38,7 +60,7 @@ const Gallery = () => {
                className="w-full h-64 object-cover" 
           />
           <h3 className="text-lg font-semibold">{art.title}</h3>
-          <p className="text-sm text-gray-500">{art.category}</p>
+          <p className="text-sm text-gray-500">{getServiceName(art.service_id)}</p>
           </div>
         ))}
       </div>
@@ -67,7 +89,7 @@ const Gallery = () => {
             </h2>
 
             <p className="text-sm text-gray-500 mb-2">
-              {selectedNail.category}
+              {getServiceName(selectedNail.service_id)}
             </p>
 
             <p className="text-sm text-gray-600 mb-4">
@@ -75,7 +97,15 @@ const Gallery = () => {
             </p>
 
             {/* Future booking button */}
-            <button className="w-full bg-brand-primary text-white py-2 rounded-lg hover:bg-black transition">
+            <button
+              onClick ={() => 
+                navigate("/book", {
+                  state: {
+                    selectedServiceId: selectedNail.service_id,
+                    selectedNail:selectedNail,
+                  }
+                })
+              } className="w-full bg-brand-primary text-white py-2 rounded-lg hover:bg-black transition">
               Book an Appointment
             </button>
 
