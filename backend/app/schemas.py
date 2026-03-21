@@ -10,6 +10,7 @@ class NailArtBase(BaseModel):
     description : str
     category : str
     image_url : str
+    
 
 class NailArtCreate(NailArtBase):
     pass
@@ -17,6 +18,7 @@ class NailArtCreate(NailArtBase):
 class NailArtResponse(NailArtBase):
     id: int
     created_at: datetime
+    service_id: int
     
     #use when its not dictionary
     class Config:

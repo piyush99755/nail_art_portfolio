@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..auth_utils import get_current_user
-from ..models import User
+from ..models import User, NailArt
 
 #all routes inside this file starts with /nail-arts
 router = APIRouter(
@@ -18,7 +18,7 @@ router = APIRouter(
 def create_nail_art(
     title: str = Form(...),
     description: str = Form(...),
-    category: str = Form(...),
+    service_id: int = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db), #creates database session before running following function
     current_user: User = Depends(get_current_user) #get current user
@@ -30,7 +30,14 @@ def create_nail_art(
     if file.content_type not in ['image/jpeg', 'image/png']:
         raise HTTPException(status_code=400, detail="Invalid Image Format!!!")
     
-    
+    #  validate service
+    service = db.query(models.Service).filter(
+        models.Service.id == service_id
+    ).first()
+
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+
     #upload image to clodinary
     try:
         upload_result = cloudinary.uploader.upload(file.file)
@@ -42,7 +49,7 @@ def create_nail_art(
     new_nail_art = models.NailArt(
         title=title,
         description=description,
-        category=category,
+        service_id=service_id,
         image_url=image_url
     )
     
