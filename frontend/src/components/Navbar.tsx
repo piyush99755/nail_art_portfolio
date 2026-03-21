@@ -1,42 +1,58 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+
 
 const Navbar = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
     
 
     return (
-        <nav className="bg-white shadow-md">
-            <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-                <Link to="/gallery" className="flex items-center gap-2">
-                    <img 
-                        src="/logo.png" 
-                        alt="Opal Nails" 
-                        className="h-10 object-contain"
-                    />
+        <>
+            <nav className="flex justify-between items-center px-6 py-4 shadow-md bg-white">
+                {/* Logo */}
+                <h1 className="text-xl font-bold">Opal Nails</h1>
 
-                    <span className="text-lg font-semibold tracking-wide text-[#2B2B2B]">
-                        Opal Nails
-                    </span>
-                </Link>
-
+                {/* Desktop Menu */}
                 <div className="hidden md:flex gap-6 items-center">
-                    <Link to="/gallery" className="hover:text-brand-primary">
-                       Gallery
-                    </Link>
-
-                    <Link to='/book' className="hover:text-brand-primary">
-                        Book
-                    </Link>
-
+                    <Link to="/gallery">Gallery</Link>
+                    <Link to="/book">Book</Link>
                     <Link
                         to="/login"
-                        className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-black transition"
+                        className="bg-brand-primary text-white px-4 py-2 rounded-lg"
                     >
                         Admin Login
                     </Link>
-
                 </div>
-            </div>
-        </nav>
+
+                {/* Mobile Hamburger */}
+                <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden text-2xl"
+                >
+                ☰
+                </button>
+            </nav>
+            {/* Mobile Dropdown */}
+            {menuOpen && (
+                <div className="absolute right-4 top-16 md:hidden bg-white shadow-md px-4 py-4 flex flex-col gap-4 w-max rounded-lg">
+                <Link to="/gallery" onClick={() => setMenuOpen(false)}>
+                    Gallery
+                </Link>
+
+                <Link to="/book" onClick={() => setMenuOpen(false)}>
+                    Book
+                </Link>
+
+                <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="bg-brand-primary text-white px-4 py-2 rounded-lg text-center"
+                >
+                    Admin Login
+                </Link>
+                </div>
+            )}
+        </>
     )
 }
 

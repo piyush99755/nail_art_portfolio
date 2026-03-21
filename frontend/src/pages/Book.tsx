@@ -161,7 +161,15 @@ const Book = () => {
     );
 
     return (
-        <div className='max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md'>
+        <div className='relative max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md'>
+            {/*  close button */}
+            <button
+                onClick={() => navigate(-1)}
+                className="absolute top-4 right-4 text-lg bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"
+            >
+                ✕
+            </button>
+            
             <h2 className='text-3xl font-bold mb-6 text-center'>
                 Book an Appointment
             </h2>
