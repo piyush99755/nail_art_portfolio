@@ -1,9 +1,10 @@
 import os
 import stripe
-from fastapi import Depends, APIRouter, HTTPException, Request
+from fastapi import Depends, APIRouter, HTTPException, Request, BackgroundTasks
 from ..database import SessionLocal
 from .. import models
 from dotenv import load_dotenv
+from app.routes.email import send_booking_email
 
 load_dotenv()
 
@@ -14,7 +15,8 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 @router.post('/webhook/stripe')
 async def stripe_webook(
-    request: Request
+    request: Request,
+    background_tasks: BackgroundTasks
 ):
     payload = await request.body()
     signature_header = request.headers.get("stripe-signature")
@@ -43,6 +45,13 @@ async def stripe_webook(
             appointment.status = "confirmed"
             appointment.payment_status = "paid"
             db.commit()
+            
+            # SEND EMAIL
+            background_tasks.add_task(
+                send_booking_email,
+                appointment.client_email, 
+                appointment
+            )
             
         db.close()
         
