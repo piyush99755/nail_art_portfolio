@@ -26,7 +26,9 @@ class NailArtResponse(NailArtBase):
 #==========================
 #Authentication Schemas
 #=========================
-
+class UserCreate(BaseModel):
+    email:str
+    password:str
 
 class TokenResponse(BaseModel):
     access_token: str

@@ -4,7 +4,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models
-from ..auth_utils import create_access_token, verify_password 
+from ..auth_utils import create_access_token, verify_password, hash_password 
+from ..schemas import UserCreate
 
 
 
@@ -12,6 +13,24 @@ router = APIRouter(
     prefix = "/auth",
     tags = ["Auth"]
 )
+
+#route to register user
+@router.post('/register')
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
+    hashed_password = hash_password(user_data.password)
+    
+    user = models.User(
+        email=user_data.email,
+        username=user_data.username,
+        password=hashed_password
+    )
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    return user
+    
 
 @router.post('/login')
 def login(
