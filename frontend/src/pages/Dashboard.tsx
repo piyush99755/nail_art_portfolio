@@ -226,7 +226,7 @@ const Dashboard = () => {
                 <img
                 src={preview}
                 alt="Preview"
-                className="w-full h-64 object-cover rounded-lg mb-4"
+                className="w-full aspect-square object-cover object-center rounded-lg"
                 />
                 )}
 
@@ -254,7 +254,7 @@ const Dashboard = () => {
                         <img 
                             src={art.image_url} 
                             alt={art.title} 
-                            className='w-full h-48 object-cover'
+                            className='w-full aspect-square object-cover rounded-lg'
                         />
                         <div className='p-4'>
                             <h4 className='font-semibold'>{art.title}</h4>

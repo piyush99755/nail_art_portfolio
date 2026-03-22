@@ -57,7 +57,7 @@ const Gallery = () => {
           className="bg-white p-8 rounded-xl shadow-md border border-gray-100 w-full max-w-lg cursor-pointer hover:shadow-lg transition">
           <img src={art.image_url} 
                alt={art.title}
-               className="w-full h-64 object-cover" 
+               className="w-full aspect-square object-cover rounded-lg" 
           />
           <h3 className="text-lg font-semibold">{art.title}</h3>
           <p className="text-sm text-gray-500">{getServiceName(art.service_id)}</p>
@@ -66,7 +66,7 @@ const Gallery = () => {
       </div>
 
       {selectedNail && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           {/* Modal Box */}
           <div className="bg-white rounded-2xl p-6 max-w-lg w-full relative">
             {/* Close Button */}
@@ -80,7 +80,7 @@ const Gallery = () => {
             <img
               src={selectedNail.image_url}
               alt={selectedNail.title}
-              className="w-full h-72 object-cover rounded-lg mb-4"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
 
             {/* Details */}
