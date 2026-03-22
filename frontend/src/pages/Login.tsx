@@ -71,7 +71,7 @@ const Login = () => {
                 onClick={() => navigate('/gallery')}
                 className="w-full mt-4 border border-brand-primary text-brand-primary py-2 rounded-lg hover:bg-pink-50 transition "
                 >
-                    Continue as guest
+                    Continue As Guest
                 </button>
             </div>
         </div>
