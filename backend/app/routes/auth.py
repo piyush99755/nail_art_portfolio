@@ -19,6 +19,14 @@ router = APIRouter(
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     hashed_password = hash_password(user_data.password)
     
+    existing_user = db.query(models.User).filter(
+        (models.User.email == user_data.email) |
+        (models.User.username == user_data.username)
+    ).first()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
     user = models.User(
         email=user_data.email,
         username=user_data.username,

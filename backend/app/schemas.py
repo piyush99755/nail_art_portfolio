@@ -28,6 +28,7 @@ class NailArtResponse(NailArtBase):
 #=========================
 class UserCreate(BaseModel):
     email:str
+    username: str
     password:str
 
 class TokenResponse(BaseModel):
