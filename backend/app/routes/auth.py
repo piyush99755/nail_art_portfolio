@@ -30,7 +30,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     user = models.User(
         email=user_data.email,
         username=user_data.username,
-        password=hashed_password
+        password_hash=hashed_password
     )
     
     db.add(user)
