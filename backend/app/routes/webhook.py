@@ -13,7 +13,7 @@ router = APIRouter()
 endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-@router.post('/webhook/stripe')
+@router.post('/webhook')
 async def stripe_webook(
     request: Request,
     background_tasks: BackgroundTasks
@@ -30,10 +30,14 @@ async def stripe_webook(
         raise HTTPException(status_code= 400, detail="Invalid webhook signature")
     
     #handle successful payment
-    if event["type"] == "payment_intent.succeeded" :
-        payment_intent = event["data"]["object"]
+    if event["type"] == "checkout.session.completed" :
+        session = event["data"]["object"]
         
-        appointment_id = payment_intent["metadata"].get("appointment_id")
+        appointment_id = session.get("metadata", {}).get("appointment_id")
+        
+        if not appointment_id:
+            print("No appointment_id in metadata")
+            return {"status": "no appointment id"}
         
         db = SessionLocal()
         
