@@ -30,35 +30,28 @@ async def stripe_webook(
         raise HTTPException(status_code= 400, detail="Invalid webhook signature")
     
     #handle successful payment
-    if event["type"] == "checkout.session.completed" :
-        session = event["data"]["object"]
-        
-        appointment_id = session.get("metadata", {}).get("appointment_id")
-        
-        if not appointment_id:
-            print("No appointment_id in metadata")
-            return {"status": "no appointment id"}
-        
-        db = SessionLocal()
-        
-        appointment = db.query(models.Appointment).filter(
-            models.Appointment.id == int(appointment_id)
-        ).first()
-        
-        if appointment:
-            appointment.status = "confirmed"
-            appointment.payment_status = "paid"
-            db.commit()
-            
-            # SEND EMAIL
-            background_tasks.add_task(
-                send_booking_email,
-                appointment.client_email, 
-                appointment
-            )
-            
-        db.close()
-        
-    return {"status": "success"}
-    
- 
+    if event["type"] == "payment_intent.succeeded":
+        payment_intent = event["data"]["object"]
+
+        appointment_id = payment_intent["metadata"].get("appointment_id")
+        print("APPOINTMENT ID:", appointment_id)
+
+        if appointment_id:
+            db = SessionLocal()
+
+            appointment = db.query(models.Appointment).filter(
+                models.Appointment.id == int(appointment_id)
+            ).first()
+
+            if appointment:
+                appointment.status = "confirmed"
+                appointment.payment_status = "paid"
+                db.commit()
+
+                background_tasks.add_task(
+                    send_booking_email,
+                    appointment.client_email,
+                    appointment
+                )
+
+            db.close()
